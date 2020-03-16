@@ -20,11 +20,14 @@ class Chat
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=32, name = "chatUsers")
+     * @ORM\Column(type="integer", length=32, name = "userIdCreated")
      */
-    private $chatusers;
+    private $userIdCreated;
 
-
+    /**
+     * @ORM\Column(type="integer", length=32, name = "userIdMember")
+     */
+    private $userIdMember;
 
     /**
      * @var \DateTime Data utworzenia produktu
@@ -33,14 +36,25 @@ class Chat
      */
     private $lastCheck;
 
-    public function __construct(string $chatusers)
+    public function __construct(int $userIdCreated, int $userIdMember)
     {
-        $this->chatusers = $chatusers;
+        $this->userIdCreated = $userIdCreated;
+        $this->userIdMember = $userIdMember;
         $this->lastCheck = new \DateTime('now', new \DateTimeZone(date_default_timezone_get()));
     }
 
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getUserCreatedId()
+    {
+        return $this->userIdCreated;
+    }
+
+    public function getUserMemberId()
+    {
+        return $this->userIdMember;
     }
 }

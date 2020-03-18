@@ -7,9 +7,7 @@ namespace App\Controller;
 use App\Entity\Chat;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -44,14 +42,14 @@ class ChatController extends AbstractController
 
         $userCreated = $entityManager->getRepository(User::class)->find($userIdCreated);
         if (!$userCreated) {
-            return new Response('id : userIdCreated '.$userIdCreated, Response::HTTP_NOT_FOUND);
+            return new Response('id : userIdCreated ' . $userIdCreated, Response::HTTP_NOT_FOUND);
         }
         $userCreated->setEnable(true);
         $entityManager->flush();
 
         $userMember = $entityManager->getRepository(User::class)->find($userIdMember);
         if (!$userMember) {
-            return new Response('id : userIdMember '.$userIdMember, Response::HTTP_NOT_FOUND);
+            return new Response('id : userIdMember ' . $userIdMember, Response::HTTP_NOT_FOUND);
         }
         $userMember->setEnable(true);
         $entityManager->flush();
@@ -75,7 +73,8 @@ class ChatController extends AbstractController
         $queryChat = $entityManager->createQuery($dql)
             ->setMaxResults(1)
             ->getResult();
-           $chatId= array_pop($queryChat)->getId();
+        $chatId = array_pop($queryChat)->getId();
+
         return new Response((string) $chatId ?? null, Response::HTTP_OK);
     }
 }

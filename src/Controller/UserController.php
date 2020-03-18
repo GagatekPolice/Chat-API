@@ -124,7 +124,7 @@ class UserController extends AbstractController
         // akutalizacja  drugiego użytkownika
         $entityManager->flush();
 
-        return new Response((string) $userMember->getId(), Response::HTTP_NO_CONTENT);
+        return new Response('', Response::HTTP_NO_CONTENT);
     }
 
     /**

@@ -20,7 +20,7 @@ class ChatController extends AbstractController
     /**
      *  Usunięcie chatu .
      *
-     * @Route("/{chatId}", name="deleteChat")
+     * @Route("/{chatId}", name="deleteChat", methods={"DELETE"})
      *
      * @param int $chatId id usuwanego chatu
      */
@@ -59,4 +59,23 @@ class ChatController extends AbstractController
         return new Response('', Response::HTTP_NO_CONTENT);
     }
 
+    /**
+     *  Wyszukanie chatu użytkownika.
+     *
+     * @Route("/{userId}", name="getChatId", methods={"GET"})
+     *
+     * @param int $userId id usuwanego chatu
+     */
+    public function getChatAction(int $userId)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $dql = 'SELECT chat FROM App\Entity\Chat chat WHERE chat.userIdCreated=' . $userId . ' OR chat.userIdMember=' . $userId;
+
+        $queryChat = $entityManager->createQuery($dql)
+            ->setMaxResults(1)
+            ->getResult();
+           $chatId= array_pop($queryChat)->getId();
+        return new Response((string) $chatId ?? null, Response::HTTP_OK);
+    }
 }

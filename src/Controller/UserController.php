@@ -20,7 +20,7 @@ class UserController extends AbstractController
     /**
      *  Dodanie użytkownika czatu.
      *
-     * @Route("", name="postUser")
+     * @Route("", name="postUser", methods={"POST"})
      *
      * @param Request $request Obiekt reprezentujący żądanie HTTP
      *
@@ -81,7 +81,7 @@ class UserController extends AbstractController
     /**
      *  Usunięcie użytkownika .
      *
-     * @Route("/{userId}", name="deleteUser")
+     * @Route("/{userId}", name="deleteUser", methods={"DELETE"})
      *
      * @param int $userId id usuwanego użytkownika
      */

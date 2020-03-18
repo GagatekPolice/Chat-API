@@ -37,7 +37,7 @@ class UserController extends AbstractController
         if (!empty($content)) {
             $parameters = json_decode($content, true);
         }
-        
+
         if (!isset($parameters['nickname'])) {
             throw new BadRequestHttpException('Błędne dane');
         }

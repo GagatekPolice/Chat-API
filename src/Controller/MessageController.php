@@ -48,4 +48,36 @@ class MessageController extends AbstractController
 
         return new Response('', Response::HTTP_NO_CONTENT);
     }
+
+    /**
+     *  Pobranie wiadomości
+     *
+     * @Route("/{userId}", name="getMessage", methods={"GET"})
+     *
+     * @param int $userId id usuwanego użytkownika
+     * 
+     * @return Message zwraca chat z jego wszystkimi informacjami
+     */
+    public function getMessageAction(int $userId) 
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $dql = 'SELECT message FROM App\Entity\Message message WHERE message.receiver='.$userId;
+
+        $queryUser = $entityManager->createQuery($dql)
+            ->setMaxResults(1)
+            ->getResult();
+
+        $message=array_pop($queryUser) ?? null;
+
+        if (!$message) {
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
+        $entityManager->remove($message);
+        $entityManager->flush();
+
+        return $this->json([
+            'message' => $message->getMessage(),
+        ]);
+    }
 }

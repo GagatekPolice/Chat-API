@@ -59,4 +59,9 @@ class Message
     {
         return $this->id;
     }
+
+        public function getMessage()
+    {
+        return $this->message;
+    }
 }

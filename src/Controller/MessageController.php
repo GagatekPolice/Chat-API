@@ -70,9 +70,21 @@ class MessageController extends AbstractController
 
         $message=array_pop($queryUser) ?? null;
 
+        // update daty usera
+        $user = $entityManager->getRepository(User::class)->find($userId);
+        $user->updateDate();
+        $entityManager->flush();
+
         if (!$message) {
             return new Response('', Response::HTTP_NOT_FOUND);
         }
+        else{
+            // update daty chatu pobranego z numeru wiadomości
+            $chat = $entityManager->getRepository(Chat::class)->find($message->getChatId());
+            $chat->updateDate();
+            $entityManager->flush();
+        }
+
         $entityManager->remove($message);
         $entityManager->flush();
 

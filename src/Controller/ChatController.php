@@ -75,6 +75,18 @@ class ChatController extends AbstractController
             ->getResult();
         $chatId = array_pop($queryChat)->getId();
 
+        // update daty usera
+        $user = $entityManager->getRepository(User::class)->find($userId);
+        $user->updateDate();
+        $entityManager->flush();
+
+        // update daty chatu
+        $chat = $entityManager->getRepository(Chat::class)->find($chatId);
+        $chat->updateDate();
+        $entityManager->flush();
+        if(!$chatId){
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
         return new Response((string) $chatId ?? null, Response::HTTP_OK);
     }
 }

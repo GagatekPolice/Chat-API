@@ -60,8 +60,19 @@ class Message
         return $this->id;
     }
 
-        public function getMessage()
+    public function getMessage()
     {
         return $this->message;
+    }
+
+    public function getChatId()
+    {
+        return $this->chatId;
+    }
+
+    public function updateDate()
+    {
+        $this->lastCheck = new \DateTime('now', new \DateTimeZone(date_default_timezone_get()));
+        return $this;
     }
 }

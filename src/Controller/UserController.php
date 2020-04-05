@@ -110,10 +110,10 @@ class UserController extends AbstractController
         $entityManager->remove($chat);
 
         // ustawienie użytkownika chatu na dostępnego
-        if ($userId === $chat->getUserCreatedId()) {
+        if ($userId == $chat->getUserCreatedId()) {
             $userMemberId = $chat->getUserMemberId();
         } else {
-            $userMemberId = $userId;
+            $userMemberId = $chat->getUserCreatedId();
         }
         // aktualizacja usera
         $entityManager->flush();

@@ -53,7 +53,18 @@ class ChatController extends AbstractController
         }
         $userMember->setEnable(true);
         $entityManager->flush();
+
         // ToDo: Dodać by próbiwało im znaleźć czaz kimś innym, jeżli nie znajdzie to łączy ich jeszcze raz ze sobą
+        $enableUser1 = $this->findChatUser($entityManager);
+        $enableUser2 = $this->findChatUser($entityManager, $enableUser1->getId());
+
+        // Stworzenie chatu
+        $chat = new Chat($enableUser1->getId(), $enableUser2->getId());
+        $entityManager->persist($chat);
+
+        // dodanie chatu
+        $entityManager->flush();
+
         return new Response('', Response::HTTP_NO_CONTENT);
     }
 
@@ -84,9 +95,47 @@ class ChatController extends AbstractController
         $chat = $entityManager->getRepository(Chat::class)->find($chatId);
         $chat->updateDate();
         $entityManager->flush();
-        if(!$chatId){
+        if (!$chatId) {
             return new Response('', Response::HTTP_NOT_FOUND);
         }
-        return new Response((string) $chatId ?? null, Response::HTTP_OK);
+        // odnalezenie uzytkownika z którym gadamy
+        if ($userId === $chat->getUserCreatedId()) {
+            $userMemberId = $chat->getUserMemberId();
+        } else {
+            $userMemberId = $chat->getUserCreatedId();
+        }
+
+        $userMember = $this->getDoctrine()
+            ->getRepository(User::class)
+            ->find($userMemberId);
+
+        return $this->json([
+            'chatId' => $chatId,
+            'userIdCreated' => $chat->getUserCreatedId(),
+            'userIdMember' => $chat->getUserMemberId(),
+            'stangerNickname' => $userMember->getNickname(),
+        ]);
+    }
+
+    /**
+     *  Metoda wyszukuje dostępnego użytkownika.
+     *
+     * @param EntityManager $entityManager Obiekt entityManagera
+     *
+     * @return User|null
+     */
+    private function findChatUser($entityManager, $userId = null)
+    {
+        if (!$userId) {
+            $dql = 'SELECT user FROM App\Entity\User user WHERE user.enable>0';
+        } else {
+            $dql = 'SELECT user FROM App\Entity\User user WHERE user.enable>0 NOT LIKE user.id=' . $userId;
+        }
+
+        $queryUser = $entityManager->createQuery($dql)
+            ->setMaxResults(1)
+            ->getResult();
+
+        return array_pop($queryUser) ?? null;
     }
 }

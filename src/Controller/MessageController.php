@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Chat;
 use App\Entity\Message;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,7 +34,6 @@ class MessageController extends AbstractController
         if (!empty($content)) {
             $parameters = json_decode($content, true);
         }
-        var_dump($parameters);
 
         if (!isset($parameters['chatId']) && !isset($parameters['sender']) && !isset($parameters['receiver']) && !isset($parameters['message'])) {
             throw new BadRequestHttpException('Błędne dane');
@@ -46,29 +46,33 @@ class MessageController extends AbstractController
         $entityManager->persist($message);
         $entityManager->flush();
 
+        $user = $entityManager->getRepository(User::class)->find($parameters['sender']);
+        $user->updateDate();
+        $entityManager->flush();
+
         return new Response('', Response::HTTP_NO_CONTENT);
     }
 
     /**
-     *  Pobranie wiadomości
+     *  Pobranie wiadomości.
      *
      * @Route("/{userId}", name="getMessage", methods={"GET"})
      *
      * @param int $userId id usuwanego użytkownika
-     * 
+     *
      * @return Message zwraca chat z jego wszystkimi informacjami
      */
-    public function getMessageAction(int $userId) 
+    public function getMessageAction(int $userId)
     {
         $entityManager = $this->getDoctrine()->getManager();
 
-        $dql = 'SELECT message FROM App\Entity\Message message WHERE message.receiver='.$userId;
+        $dql = 'SELECT message FROM App\Entity\Message message WHERE message.receiver=' . $userId;
 
         $queryUser = $entityManager->createQuery($dql)
             ->setMaxResults(1)
             ->getResult();
 
-        $message=array_pop($queryUser) ?? null;
+        $message = array_pop($queryUser) ?? null;
 
         // update daty usera
         $user = $entityManager->getRepository(User::class)->find($userId);
@@ -78,12 +82,11 @@ class MessageController extends AbstractController
         if (!$message) {
             return new Response('', Response::HTTP_NOT_FOUND);
         }
-        else{
-            // update daty chatu pobranego z numeru wiadomości
-            $chat = $entityManager->getRepository(Chat::class)->find($message->getChatId());
-            $chat->updateDate();
-            $entityManager->flush();
-        }
+
+        // update daty chatu pobranego z numeru wiadomości
+        $chat = $entityManager->getRepository(Chat::class)->find($message->getChatId());
+        $chat->updateDate();
+        $entityManager->flush();
 
         $entityManager->remove($message);
         $entityManager->flush();

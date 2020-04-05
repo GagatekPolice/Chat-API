@@ -61,6 +61,7 @@ class UserController extends AbstractController
 
         // aktualizacja dodawania użytkownika
         $enableUserEntity = $entityManager->getRepository(User::class)->find($enableUser->getId());
+        $enableUserEntity->updateDate();
         $entityManager->flush();
 
         // Stworzenie chatu
@@ -75,6 +76,7 @@ class UserController extends AbstractController
             'id' => $user->getId(),
             'interlocutor' => $enableUserEntity->getId(),
             'chatId' => $chat->getId(),
+            'interlocutorNickname' => $enableUser->getNickname(),
         ]);
     }
 
@@ -110,7 +112,7 @@ class UserController extends AbstractController
         $entityManager->remove($chat);
 
         // ustawienie użytkownika chatu na dostępnego
-        if ($userId == $chat->getUserCreatedId()) {
+        if ($userId === $chat->getUserCreatedId()) {
             $userMemberId = $chat->getUserMemberId();
         } else {
             $userMemberId = $chat->getUserCreatedId();
